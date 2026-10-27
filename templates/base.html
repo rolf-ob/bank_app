@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {{page}}
+    </title>
+</head>
+
+<style>
+    body {
+        height: 40vh;
+    }
+
+    #main {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #left {
+        width: 33%;
+    }
+
+    #header {
+        width: 34%;
+        display: flex;
+        justify-content: center;
+    }
+
+    #redirect {
+        width: 33%;
+        margin: 0px 5px;
+        display: flex;
+        justify-content: end;
+    }
+
+    .header_item {
+        width: 80;
+        height: 20;
+        font-size: 24px;
+        margin: 5px;
+    }
+</style>
+{% block style %}
+{% endblock %}
+
+<body>
+    <div id="main">
+        <div id="left"></div>
+
+        <div id="header">
+            <h1>BANK APP</h1>
+        </div>
+
+        <div id="redirect">
+            <form action="/">
+                <button class="header_item">Home</button>
+            </form>
+            <form action="/login">
+                <button class="header_item">Log In</button>
+            </form>
+        </div>
+    </div>
+
+    {% block body %}
+    {% endblock %}
+</body>
+</html>

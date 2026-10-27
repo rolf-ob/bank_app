@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    :root {
+        --button_color1: rgb(0, 128, 255);
+        --button_color1_hover: rgb(105, 180, 255);
+        --button_color2: rgb(200, 200, 200);
+        --button_color2_hover: rgb(230, 230, 230);
+    }
+
+    #login {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    #login_textboxes {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #login_buttons {
+        display: flex;
+        justify-content: center;
+    }
+
+    .textbox {
+        margin: 5px;
+        width: 400px;
+        height: 40px;
+        font-size: 24px;
+    }
+
+    .button {
+        margin: 5px;
+        width: 180px;
+        height: 40px;
+        font-size: 24px;
+    }
+
+    #log_in_button {
+        background-color: var(--button_color1);
+        color: rgb(255, 255, 255);
+        transition: all 0.2s;
+    }
+
+    #log_in_button:hover {
+        background-color: var(--button_color1_hover);
+        transition: all 0.2s;
+    }
+
+    #create_account_button {
+        background-color: var(--button_color2);
+        color: rgb(0, 0, 0);
+        transition: all 0.2s;
+    }
+
+    #create_account_button:hover {
+        background-color: var(--button_color2_hover);
+        transition: all 0.2s;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div id="login">
+    <form action="/create" method="POST">
+        <div id="login_textboxes">
+            <input 
+                type="email"
+                name="email"
+                class="textbox"
+                placeholder="Email address"
+            >
+            <input
+                type="password"
+                name="password"
+                class="textbox"
+                placeholder="Password"
+            >
+        </div>
+
+        <div id="login_buttons">
+            <button class="button" id="log_in_button">Log In</button>
+            <button class="button" id="create_account_button" type="submit">Create Account</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
