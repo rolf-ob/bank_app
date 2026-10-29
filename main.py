@@ -1,11 +1,13 @@
 import os
 
-from flask import Flask, render_template, request, make_response
+from dotenv import load_dotenv
+from flask import Flask, render_template, request
 from sqlalchemy import create_engine
 
 from user import Base, create_user, login_user, create_jwt_token, verify_token
 
-SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+load_dotenv()
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 if not SECRET_KEY:
     raise RuntimeError("Set secret environment variable: $env:JWT_SECRET_KEY = \"key\"")
 
