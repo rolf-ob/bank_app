@@ -13,8 +13,12 @@
         margin: 0px;
     }
 
-    #error {
-        color: rgb(255, 0, 0);
+    .flash.success {
+    color: green;
+}
+
+    .flash.error {
+        color: red;
     }
 
     #login {
@@ -77,9 +81,16 @@
 {% block body %}
 
 <div id="login">
-    <h1 id="title">LOG IN OR CREATE ACCOUNT</h1>
-    <h2 id="error">{{error}}</h2>
-    <form action="/create_login" method="POST">
+    <h1 id="title">LOG IN TO ACCOUNT</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endwith %}
+
+    <form action="/log_into_account" method="POST">
         <div id="login_textboxes">
             <input 
                 type="email"
@@ -96,8 +107,7 @@
         </div>
 
         <div id="login_buttons">
-            <button class="button" id="log_in_button" name="action" value="log in">Log In</button>
-            <button class="button" id="create_account_button" name="action" value="create account">Create Account</button>
+            <button class="button" id="log_in_button" name="action">Log In</button>
         </div>
     </form>
 </div>

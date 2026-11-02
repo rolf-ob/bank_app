@@ -56,12 +56,22 @@
             <form action="/">
                 <button class="header_item">Home</button>
             </form>
-            <form action="/login">
-                <button class="header_item">Log In</button>
-            </form>
-            <form action="/account">
-                <button class="header_item">Account</button>
-            </form>
+
+            {% if current_user %}
+                <form action="/account">
+                    <button class="header_item">Account</button>
+                </form>
+                
+            {% else %}
+                <form action="/log_in">
+                    <button class="header_item">Log In</button>
+                </form>
+                
+                <form action="/sign_in">
+                    <button class="header_item">Sign In</button>
+                </form>
+                
+            {% endif %}
         </div>
     </div>
 

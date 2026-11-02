@@ -32,6 +32,7 @@ def create_user(engine, email, password):
             )
             session.add(user)
             session.commit()
+            user = get_user_by_email(engine, email)
         
         except IntegrityError:
             session.rollback()
@@ -39,7 +40,7 @@ def create_user(engine, email, password):
 
         return user
 
-def login_user(engine, email, password):
+def log_into_user(engine, email, password):
     user = get_user_by_email(engine, email)
 
     if user and verify_password(user.password_hash, password):
