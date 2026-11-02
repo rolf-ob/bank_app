@@ -13,7 +13,7 @@ Base.metadata.create_all(engine)
 load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 if not SECRET_KEY:
-    raise RuntimeError("Set secret environment variable: $env:JWT_SECRET_KEY = \"key\"")
+    raise RuntimeError("Set secret environment variable: $env:JWT_SECRET_KEY = \"key\" from generated key: python -c \"import secrets; print(secrets.token_urlsafe(32))\"")
 
 flask.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY")
 if not flask.config["SECRET_KEY"]:

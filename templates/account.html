@@ -2,77 +2,77 @@
 
 {% block style %}
 <style>
-    :root {
-        --button_color1: rgb(0, 128, 255);
-        --button_color1_hover: rgb(105, 180, 255);
-        --button_color2: rgb(255, 0, 0);
-        --button_color2_hover: rgb(200, 0, 0);
+    .account-card {
+        width: min(560px, 100%);
+        margin: 70px auto 0;
+        padding: 44px 48px 48px;
+        border: 1px solid rgba(255,255,255,.95);
+        border-radius: 24px;
+        background: rgba(255,255,255,.88);
+        box-shadow: var(--shadow);
+        text-align: center;
     }
-
-    .flash.success {
-    color: green;
-}
-
-    .flash.error {
-        color: red;
+    .account-card h1 {
+        margin: 0 0 28px;
+        color: var(--ink);
+        font-size: 32px;
+        letter-spacing: -.045em;
     }
-
+    .account-card h2 {
+        margin: 22px 0 28px;
+        color: var(--brand-dark);
+        font-size: 25px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+    .account-card form { margin: 12px 0 0; }
+    .textbox {
+        width: 100%;
+        height: 52px;
+        margin: 0 0 12px;
+        padding: 0 16px;
+        border: 1px solid #dce7e1;
+        border-radius: 11px;
+        color: var(--ink);
+        background: #f9fbfa;
+        font-size: 15px;
+    }
+    .textbox:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(8,127,112,.09); outline: none; }
     .button {
-        margin: 5px;
-        width: 180px;
-        height: 40px;
-        font-size: 24px;
+        width: 100%;
+        min-height: 49px;
+        margin: 0;
+        padding: 0 18px;
+        border: 0;
+        border-radius: 11px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .2s, transform .2s;
     }
-
-    #log_in_button {
-        background-color: var(--button_color1);
-        color: rgb(255, 255, 255);
-        transition: all 0.2s;
-    }
-
-    #log_in_button:hover {
-        background-color: var(--button_color1_hover);
-        transition: all 0.2s;
-    }
-
-    #delete_account_button {
-        background-color: var(--button_color2);
-        color: rgb(0, 0, 0);
-        transition: all 0.2s;
-    }
-
-    #delete_account_button:hover {
-        background-color: var(--button_color2_hover);
-        transition: all 0.2s;
-    }
+    #log_in_button { color: #fff; background: var(--brand); }
+    #log_in_button:hover { background: var(--brand-dark); transform: translateY(-1px); }
+    #delete_account_button { color: #a43b3b; background: #fff0ee; border: 1px solid #f3d4cf; }
+    #delete_account_button:hover { color: #fff; background: #b94c47; transform: translateY(-1px); }
+    @media (max-width: 560px) { .account-card { margin-top: 38px; padding: 36px 24px; } }
 </style>
 {% endblock %}
 
 {% block body %}
-
-<h1>Account</h1>
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-        <div class="flash {{ category }}">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endwith %}
-
-<h2>{{current_user.name}}</h2>
-
-<form action="/log_out" method="POST">
-    <button class="button" id="log_in_button" name="action">Log Out</button>
-</form>
-
-<form action="/delete_account" method="POST">
-    <input
-        type="password"
-        name="password"
-        class="textbox"
-        placeholder="Password"
-    >
-    <button class="button" id="delete_account_button" name="action">Delete Account</button>
-</form>
-
+<section class="account-card">
+    <h1>Account</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+    <h2>{{current_user.name}}</h2>
+    <form action="/log_out" method="POST">
+        <button class="button" id="log_in_button" name="action">Log Out</button>
+    </form>
+    <form action="/delete_account" method="POST">
+        <input type="password" name="password" class="textbox" placeholder="Password">
+        <button class="button" id="delete_account_button" name="action">Delete Account</button>
+    </form>
+</section>
 {% endblock %}

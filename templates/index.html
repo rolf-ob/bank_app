@@ -1,6 +1,77 @@
 {% extends "base.html" %}
+
+{% block style %}
+<style>
+    .home-wrap {
+        width: min(1080px, 100%);
+        min-height: min(690px, calc(100vh - 120px));
+        margin: 0 auto;
+        display: grid;
+        place-items: center;
+        position: relative;
+        isolation: isolate;
+    }
+    .home-wrap::before, .home-wrap::after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        border-radius: 50%;
+        filter: blur(1px);
+    }
+    .home-wrap::before {
+        width: 300px; height: 300px; top: 13%; left: 9%;
+        border: 1px solid rgba(8, 127, 112, .13);
+        box-shadow: 0 0 0 28px rgba(8, 127, 112, .025), 0 0 0 58px rgba(8, 127, 112, .02);
+    }
+    .home-wrap::after {
+        width: 170px; height: 170px; right: 12%; bottom: 13%;
+        background: linear-gradient(145deg, rgba(203, 232, 217, .6), rgba(203, 232, 217, 0));
+    }
+    .home-panel {
+        width: min(760px, 100%);
+        min-height: 350px;
+        padding: 76px 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255,255,255,.9);
+        border-radius: 28px;
+        background: rgba(255,255,255,.76);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+        position: relative;
+        overflow: hidden;
+    }
+    .home-panel::before {
+        content: '';
+        position: absolute;
+        width: 5px;
+        height: 70px;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 0 5px 5px 0;
+        background: var(--brand);
+    }
+    .home-panel h1 {
+        margin: 0;
+        color: var(--ink);
+        font-size: clamp(38px, 7vw, 68px);
+        font-weight: 800;
+        letter-spacing: -.055em;
+        text-align: center;
+    }
+    @media (max-width: 600px) {
+        .home-wrap { min-height: 70vh; }
+        .home-panel { min-height: 260px; padding: 45px 20px; border-radius: 22px; }
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-
-<h1>HOME</h1>
-
+<div class="home-wrap">
+    <section class="home-panel">
+        <h1>HOME</h1>
+    </section>
+</div>
 {% endblock %}

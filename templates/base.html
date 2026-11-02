@@ -3,79 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        {{title}}
-    </title>
+    <title>{{title}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #172b35;
+            --muted: #71818a;
+            --brand: #087f70;
+            --brand-dark: #06675d;
+            --mint: #dff3ec;
+            --paper: #f4f7f5;
+            --line: #e3ebe7;
+            --white: #ffffff;
+            --shadow: 0 24px 70px rgba(28, 61, 55, .09);
+        }
+        * { box-sizing: border-box; }
+        html { min-height: 100%; }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0 28px 72px;
+            color: var(--ink);
+            background:
+                radial-gradient(ellipse at 12% 18%, rgba(198, 231, 216, .48), transparent 34%),
+                radial-gradient(ellipse at 92% 75%, rgba(217, 235, 226, .55), transparent 32%),
+                var(--paper);
+            font-family: 'DM Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        #main {
+            width: min(1280px, 100%);
+            min-height: 94px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 0;
+            border-bottom: 1px solid rgba(210, 224, 217, .8);
+            position: relative;
+            z-index: 1;
+        }
+        #left { width: 18%; }
+        #header { width: auto; display: flex; justify-content: center; }
+        #header h1 {
+            margin: 0;
+            color: var(--ink);
+            font-family: 'Manrope', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: .16em;
+        }
+        #header h1::before {
+            content: '';
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            margin: 0 10px 1px 0;
+            border-radius: 4px 4px 4px 1px;
+            background: var(--brand);
+            transform: rotate(-12deg);
+        }
+        #redirect {
+            width: auto;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        #redirect form { margin: 0; }
+        .header_item {
+            min-width: 82px;
+            height: 40px;
+            padding: 0 15px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: #52656c;
+            background: transparent;
+            font: 600 14px 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+        }
+        .header_item:hover {
+            color: var(--brand-dark);
+            background: #e7f2ed;
+            border-color: #d8e9e1;
+            transform: translateY(-1px);
+        }
+        button, input { font: inherit; }
+        button:focus-visible, input:focus-visible { outline: 3px solid rgba(8, 127, 112, .22); outline-offset: 2px; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .flash {
+            width: fit-content;
+            max-width: 100%;
+            margin: 12px auto;
+            padding: 11px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .flash.success { color: #176b4e; background: #e5f5ec; border: 1px solid #c9e9d7; }
+        .flash.error { color: #a43b3b; background: #fff0ee; border: 1px solid #f3d4cf; }
+        @media (max-width: 680px) {
+            body { padding: 0 17px 48px; }
+            #main { min-height: 82px; flex-wrap: wrap; gap: 8px; padding: 14px 0; }
+            #left { display: none; }
+            #header { justify-content: flex-start; }
+            #header h1 { font-size: 16px; }
+            #redirect { gap: 2px; }
+            .header_item { min-width: 0; height: 36px; padding: 0 9px; font-size: 12px; }
+        }
+    </style>
+{% block style %}{% endblock %}
 </head>
-
-<style>
-    #main {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        border-style: solid;
-    }
-
-    #left {
-        width: 33%;
-    }
-
-    #header {
-        width: 34%;
-        display: flex;
-        justify-content: center;
-    }
-
-    #redirect {
-        width: 33%;
-        margin: 0px 5px;
-        display: flex;
-        justify-content: end;
-    }
-
-    .header_item {
-        width: 80;
-        height: 20;
-        font-size: 24px;
-        margin: 5px;
-    }
-</style>
-{% block style %}
-{% endblock %}
-
 <body>
     <div id="main">
         <div id="left"></div>
-
-        <div id="header">
-            <h1>BANK APP</h1>
-        </div>
-
+        <div id="header"><h1>BANK APP</h1></div>
         <div id="redirect">
-            <form action="/">
-                <button class="header_item">Home</button>
-            </form>
-
+            <form action="/"><button class="header_item">Home</button></form>
             {% if current_user %}
-                <form action="/account">
-                    <button class="header_item">Account</button>
-                </form>
-                
+                <form action="/account"><button class="header_item">Account</button></form>
             {% else %}
-                <form action="/log_in">
-                    <button class="header_item">Log In</button>
-                </form>
-                
-                <form action="/sign_in">
-                    <button class="header_item">Sign In</button>
-                </form>
-                
+                <form action="/log_in"><button class="header_item">Log In</button></form>
+                <form action="/sign_in"><button class="header_item">Sign In</button></form>
             {% endif %}
         </div>
     </div>
-
-    {% block body %}
-    {% endblock %}
+    {% block body %}{% endblock %}
 </body>
 </html>
