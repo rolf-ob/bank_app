@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, flash, url_for
 from sqlalchemy import create_engine
 
-from user import Base, create_user, log_into_user, create_jwt_token, get_user_by_token
+from user import Base, create_user, log_into_user, delete_user, create_jwt_token, get_user_by_token
 
 flask = Flask(__name__)
 engine = create_engine("sqlite:///users.db")
@@ -57,7 +57,7 @@ def create_account():
 
     if user:
         token = create_jwt_token(SECRET_KEY, user.id)
-        resp = redirect("/")
+        resp = redirect(url_for("index"))
         resp.set_cookie(
             "token",
             token,
@@ -70,7 +70,7 @@ def create_account():
     
     else:
         flash("Email already belongs to an account", "error")
-        return redirect("/sign_in")
+        return redirect(url_for("sign_in"))
 
 @flask.route("/log_into_account", methods=["POST"])
 def log_into_account():
@@ -80,7 +80,7 @@ def log_into_account():
 
     if user:
         token = create_jwt_token(SECRET_KEY, user.id)
-        resp = redirect("/")
+        resp = redirect(url_for("index"))
         resp.set_cookie(
             "token",
             token,
@@ -94,6 +94,26 @@ def log_into_account():
     else:
         flash("Invalid email or password", "error")
         return redirect(url_for("log_in"))
+
+@flask.route("/log_out", methods=["POST"])
+def log_out():
+    resp = redirect(url_for("log_in"))
+    resp.delete_cookie("token")
+    return resp
+
+@flask.route("/delete_account", methods=["POST"])
+def delete_account():
+    password = request.form.get("password")
+
+    resp = redirect(url_for("index"))
+    resp.delete_cookie("token")
+
+    if delete_user(engine, get_current_user(), password):
+        return resp
+
+    else:
+        flash("Invalid password", "error")
+        return redirect(url_for("account"))
 
 if __name__ == "__main__":
     flask.run(host="127.0.0.1", port=5000, debug=True)

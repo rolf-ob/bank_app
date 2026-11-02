@@ -48,6 +48,14 @@ def log_into_user(engine, email, password):
     
     return None
 
+def delete_user(engine, user, password):
+    with Session(engine) as session:
+        if verify_password(user.password_hash, password):
+            session.delete(user)
+            session.commit()
+            return True
+        return False
+
 def get_user_by_email(engine, email):
     with Session(engine) as session:
         statement = select(User).where(User.email == email)

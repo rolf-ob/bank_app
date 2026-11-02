@@ -1,7 +1,78 @@
 {% extends "base.html" %}
+
+{% block style %}
+<style>
+    :root {
+        --button_color1: rgb(0, 128, 255);
+        --button_color1_hover: rgb(105, 180, 255);
+        --button_color2: rgb(255, 0, 0);
+        --button_color2_hover: rgb(200, 0, 0);
+    }
+
+    .flash.success {
+    color: green;
+}
+
+    .flash.error {
+        color: red;
+    }
+
+    .button {
+        margin: 5px;
+        width: 180px;
+        height: 40px;
+        font-size: 24px;
+    }
+
+    #log_in_button {
+        background-color: var(--button_color1);
+        color: rgb(255, 255, 255);
+        transition: all 0.2s;
+    }
+
+    #log_in_button:hover {
+        background-color: var(--button_color1_hover);
+        transition: all 0.2s;
+    }
+
+    #delete_account_button {
+        background-color: var(--button_color2);
+        color: rgb(0, 0, 0);
+        transition: all 0.2s;
+    }
+
+    #delete_account_button:hover {
+        background-color: var(--button_color2_hover);
+        transition: all 0.2s;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 
 <h1>Account</h1>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <div class="flash {{ category }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endwith %}
+
 <h2>{{current_user.name}}</h2>
+
+<form action="/log_out" method="POST">
+    <button class="button" id="log_in_button" name="action">Log Out</button>
+</form>
+
+<form action="/delete_account" method="POST">
+    <input
+        type="password"
+        name="password"
+        class="textbox"
+        placeholder="Password"
+    >
+    <button class="button" id="delete_account_button" name="action">Delete Account</button>
+</form>
 
 {% endblock %}
