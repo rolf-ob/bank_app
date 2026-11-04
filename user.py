@@ -39,7 +39,7 @@ def create_new_user(engine, email, password):
             session.rollback()
             return None
 
-def log_into_user(engine, email, password):
+def login_as_user(engine, email, password):
     user = get_user_by_email(engine, email)
 
     if user and verify_password(user.password_hash, password):

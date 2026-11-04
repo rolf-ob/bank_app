@@ -44,3 +44,12 @@ def get_user_accounts(engine, user):
         accounts = session.scalars(statement).all()
 
         return accounts
+
+def get_user_account(engine, user, account_id):
+    with Session(engine) as session:
+        statement = select(Account).where(
+            Account.user_id == user.id,
+            Account.id == account_id
+        )
+        account = session.scalar(statement)
+        return account
