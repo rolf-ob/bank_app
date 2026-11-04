@@ -23,7 +23,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     accounts: Mapped[list["Account"]] = relationship(back_populates="user")
 
-def create_user(engine, email, password):
+def create_new_user(engine, email, password):
     with Session(engine) as session:
         try:
             user = User(

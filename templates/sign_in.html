@@ -53,31 +53,31 @@
         cursor: pointer;
         transition: background .2s, transform .2s, box-shadow .2s;
     }
-    #create_account_button {
+    #create_user_button {
         color: #fff;
         background: var(--brand);
         box-shadow: 0 8px 18px rgba(8,127,112,.2);
     }
-    #create_account_button:hover { background: var(--brand-dark); transform: translateY(-2px); box-shadow: 0 11px 22px rgba(8,127,112,.25); }
+    #create_user_button:hover { background: var(--brand-dark); transform: translateY(-2px); box-shadow: 0 11px 22px rgba(8,127,112,.25); }
     @media (max-width: 560px) { #login { margin-top: 38px; padding: 38px 25px; min-height: 400px; } }
 </style>
 {% endblock %}
 
 {% block body %}
 <div id="login">
-    <h1 id="title">CREATE ACCOUNT</h1>
+    <h1 id="title">CREATE USER</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
             <div class="flash {{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
-    <form action="/create_account" method="POST">
+    <form action="/create_user" method="POST">
         <div id="login_textboxes">
             <input type="email" name="email" class="textbox" placeholder="Email address">
             <input type="password" name="password" class="textbox" placeholder="Password">
         </div>
         <div id="login_buttons">
-            <button class="button" id="create_account_button" name="action">Create Account</button>
+            <button class="button" id="create_user_button" name="action">Create User</button>
         </div>
     </form>
 </div>

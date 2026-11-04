@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, flash, url_for
 from sqlalchemy import create_engine
 
-from user import Base, User, create_user, log_into_user, delete_user, create_jwt_token, get_user_by_token
-from account import Account, get_user_accounts
+from user import Base, User, create_new_user, log_into_user, delete_user, create_jwt_token, get_user_by_token
+from account import Account, get_user_accounts, create_account
 
 flask = Flask(__name__)
 engine = create_engine("sqlite:///users.db")
@@ -32,8 +32,12 @@ def inject_user():
 
 @flask.route("/")
 def index():
+
     user = get_current_user()
     accounts = get_user_accounts(engine, user) if user else []
+
+    if user:
+        create_account(engine, user, "my account")
 
     return render_template("index.html", title="Home", user=user, accounts=accounts)
 
@@ -49,15 +53,15 @@ def sign_in():
 def log_in():
     return render_template("log_in.html", title="Log In")
 
-@flask.route("/account")
-def account():
-    return render_template("account.html", title="Account")
+@flask.route("/user")
+def user():
+    return render_template("user.html", title="User")
 
-@flask.route("/create_account", methods=["POST"])
-def create_account():
+@flask.route("/create_user", methods=["POST"])
+def create_user():
     email = request.form.get("email")
     password = request.form.get("password")
-    user = create_user(engine, email, password)
+    user = create_new_user(engine, email, password)
 
     if user:
         token = create_jwt_token(SECRET_KEY, user.id)
@@ -73,11 +77,11 @@ def create_account():
         return resp
     
     else:
-        flash("Email already belongs to an account", "error")
+        flash("Email already belongs to a user", "error")
         return redirect(url_for("sign_in"))
 
-@flask.route("/log_into_account", methods=["POST"])
-def log_into_account():
+@flask.route("/log_into_user", methods=["POST"])
+def log_into_user():
     email = request.form.get("email")
     password = request.form.get("password")
     user = log_into_user(engine, email, password)
@@ -105,8 +109,8 @@ def log_out():
     resp.delete_cookie("token")
     return resp
 
-@flask.route("/delete_account", methods=["POST"])
-def delete_account():
+@flask.route("/delete_user", methods=["POST"])
+def delete_user():
     password = request.form.get("password")
 
     resp = redirect(url_for("index"))
@@ -117,7 +121,7 @@ def delete_account():
 
     else:
         flash("Invalid password", "error")
-        return redirect(url_for("account"))
+        return redirect(url_for("user"))
 
 if __name__ == "__main__":
     flask.run(host="127.0.0.1", port=5000, debug=True)

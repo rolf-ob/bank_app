@@ -2,7 +2,7 @@
 
 {% block style %}
 <style>
-    .account-card {
+    .user-card {
         width: min(560px, 100%);
         margin: 70px auto 0;
         padding: 44px 48px 48px;
@@ -12,20 +12,20 @@
         box-shadow: var(--shadow);
         text-align: center;
     }
-    .account-card h1 {
+    .user-card h1 {
         margin: 0 0 28px;
         color: var(--ink);
         font-size: 32px;
         letter-spacing: -.045em;
     }
-    .account-card h2 {
+    .user-card h2 {
         margin: 22px 0 28px;
         color: var(--brand-dark);
         font-size: 25px;
         font-weight: 700;
         overflow-wrap: anywhere;
     }
-    .account-card form { margin: 12px 0 0; }
+    .user-card form { margin: 12px 0 0; }
     .textbox {
         width: 100%;
         height: 52px;
@@ -52,15 +52,15 @@
     }
     #log_in_button { color: #fff; background: var(--brand); }
     #log_in_button:hover { background: var(--brand-dark); transform: translateY(-1px); }
-    #delete_account_button { color: #a43b3b; background: #fff0ee; border: 1px solid #f3d4cf; }
-    #delete_account_button:hover { color: #fff; background: #b94c47; transform: translateY(-1px); }
-    @media (max-width: 560px) { .account-card { margin-top: 38px; padding: 36px 24px; } }
+    #delete_user_button { color: #a43b3b; background: #fff0ee; border: 1px solid #f3d4cf; }
+    #delete_user_button:hover { color: #fff; background: #b94c47; transform: translateY(-1px); }
+    @media (max-width: 560px) { .user-card { margin-top: 38px; padding: 36px 24px; } }
 </style>
 {% endblock %}
 
 {% block body %}
-<section class="account-card">
-    <h1>Account</h1>
+<section class="user-card">
+    <h1>User</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
             <div class="flash {{ category }}">{{ message }}</div>
@@ -70,9 +70,9 @@
     <form action="/log_out" method="POST">
         <button class="button" id="log_in_button" name="action">Log Out</button>
     </form>
-    <form action="/delete_account" method="POST">
+    <form action="/delete_user" method="POST">
         <input type="password" name="password" class="textbox" placeholder="Password">
-        <button class="button" id="delete_account_button" name="action">Delete Account</button>
+        <button class="button" id="delete_user_button" name="action">Delete User</button>
     </form>
 </section>
 {% endblock %}

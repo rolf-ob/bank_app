@@ -74,8 +74,8 @@
         <h1>HOME</h1>
     </section>
     {% for account in accounts %}
-        <h2>account.name</h2>
-        account.balance
+        <h2>{{account.name}}</h2>
+        <p>{{ "%.2f"|format(account.balance) }}</p>
     {% endfor %}
 </div>
 {% endblock %}

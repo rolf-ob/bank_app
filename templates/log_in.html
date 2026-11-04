@@ -65,13 +65,13 @@
 
 {% block body %}
 <div id="login">
-    <h1 id="title">LOG IN TO ACCOUNT</h1>
+    <h1 id="title">LOG IN TO USER</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
             <div class="flash {{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
-    <form action="/log_into_account" method="POST">
+    <form action="/log_into_user" method="POST">
         <div id="login_textboxes">
             <input type="email" name="email" class="textbox" placeholder="Email address">
             <input type="password" name="password" class="textbox" placeholder="Password">

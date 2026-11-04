@@ -1,11 +1,17 @@
-from sqlalchemy import ForeignKey, String, Numeric, select
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
+from decimal import Decimal
+
+from sqlalchemy import ForeignKey, String, Numeric, select, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
 from sqlalchemy.exc import IntegrityError
 
 from user import Base
 
 class Account(Base):
     __tablename__ = "accounts"
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "name"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
@@ -21,7 +27,7 @@ def create_account(engine, user, name):
             account = Account(
                 user=user,
                 name=name,
-                balance=0
+                balance=Decimal("0.00")
             )
 
             session.add(account)
