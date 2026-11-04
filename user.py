@@ -7,7 +7,7 @@ from argon2.exceptions import VerifyMismatchError
 
 from sqlalchemy import String, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session, relationship
 
 hasher = PasswordHasher()
 
@@ -21,6 +21,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(255))
     email: Mapped[str] = mapped_column(String(255), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255))
+    accounts: Mapped[list["Account"]] = relationship(back_populates="user")
 
 def create_user(engine, email, password):
     with Session(engine) as session:
@@ -32,13 +33,11 @@ def create_user(engine, email, password):
             )
             session.add(user)
             session.commit()
-            user = get_user_by_email(engine, email)
+            return get_user_by_email(engine, email)
         
         except IntegrityError:
             session.rollback()
             return None
-
-        return user
 
 def log_into_user(engine, email, password):
     user = get_user_by_email(engine, email)

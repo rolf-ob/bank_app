@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, flash, url_for
 from sqlalchemy import create_engine
 
-from user import Base, create_user, log_into_user, delete_user, create_jwt_token, get_user_by_token
+from user import Base, User, create_user, log_into_user, delete_user, create_jwt_token, get_user_by_token
+from account import Account, get_user_accounts
 
 flask = Flask(__name__)
 engine = create_engine("sqlite:///users.db")
@@ -31,7 +32,10 @@ def inject_user():
 
 @flask.route("/")
 def index():
-    return render_template("index.html", title="Home")
+    user = get_current_user()
+    accounts = get_user_accounts(engine, user) if user else []
+
+    return render_template("index.html", title="Home", user=user, accounts=accounts)
 
 @flask.route("/base")
 def base():
