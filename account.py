@@ -53,3 +53,45 @@ def get_user_account(engine, user, account_id):
         )
         account = session.scalar(statement)
         return account
+
+def rename_account(engine, user, account_id, new_name):
+    with Session(engine) as session:
+        statement = select(Account).where(
+            Account.user_id == user.id,
+            Account.id == account_id
+        )
+        account = session.scalar(statement)
+
+        if account:
+            statement = select(Account.name).where(
+                Account.user_id == user.id
+            )
+            account_names = session.scalars(statement).all()
+
+            new_name = new_name.strip()
+            if new_name != "" and new_name not in account_names:
+                try:
+                    account.name = new_name
+                    session.commit()
+                
+                except IntegrityError:
+                    session.rollback()
+                    return None
+
+                return account
+        return None
+
+def delete_account(engine, user, account_id):
+    with Session(engine) as session:
+        statement = select(Account).where(
+            Account.user_id == user.id,
+            Account.id == account_id
+        )
+        account = session.scalar(statement)
+
+        if account:
+            session.delete(account)
+            session.commit()
+
+            return True
+        return False

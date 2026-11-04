@@ -61,9 +61,62 @@
         letter-spacing: -.055em;
         text-align: center;
     }
+    .account-button {
+        display: block;
+        padding: 10px 15px;
+        background-color: #333;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-bottom: 8px;
+    }
+
+    .account-button:hover {
+        background-color: #555;
+    }
     @media (max-width: 600px) {
-        .home-wrap { min-height: 70vh; }
-        .home-panel { min-height: 260px; padding: 45px 20px; border-radius: 22px; }
+        .home-wrap {
+            min-height: 70vh;
+        }
+
+        .home-panel {
+            min-height: 260px;
+            padding: 45px 20px;
+            border-radius: 22px;
+        }
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        color: #222;
+        padding: 25px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+    }
+
+    .modal-content input {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        margin: 10px 0 20px;
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
     }
 </style>
 {% endblock %}
@@ -74,10 +127,54 @@
         <h1>HOME</h1>
     </section>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endwith %}
+
     {% for account in accounts %}
-        <a href="{{ url_for('index', account_id=account.id) }}">
-            {{ account.name }}
-        </a>
+        <div class="account-item">
+
+            {% if open_account and open_account.id == account.id %}
+                <a
+                    href="{{ url_for('index') }}"
+                    class="account-button"
+                >
+                    {{ account.name }} (Close)
+                </a>
+            {% else %}
+                <a
+                    href="{{ url_for('index', account_id=account.id) }}"
+                    class="account-button"
+                >
+                    {{ account.name }}
+                </a>
+            {% endif %}
+
+            <button
+                type="button"
+                class="rename-button"
+                data-account-id="{{ account.id }}"
+                data-account-name="{{ account.name }}"
+                title="Rename account"
+            >
+                ✏️
+            </button>
+
+            <button
+                type="button"
+                class="delete-button"
+                data-account-id="{{ account.id }}"
+                data-account-name="{{ account.name }}"
+                title="Delete account"
+            >
+                🗑️
+            </button>
+
+        </div>
     {% endfor %}
 
     {% if open_account %}
@@ -86,8 +183,138 @@
 
     {% elif user %}
         <h1>Total: {{ "%.2f"|format(total) }}</h1>
-        
+
     {% endif %}
+    
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+
+            <h2>Rename account</h2>
+
+            <form action="{{ url_for('rename_account_route') }}" method="POST">
+
+                <input
+                    type="hidden"
+                    name="account_id"
+                    id="renameAccountId"
+                >
+
+                <label for="newAccountName">New account name</label>
+
+                <input
+                    type="text"
+                    name="new_name"
+                    id="newAccountName"
+                    maxlength="255"
+                    required
+                >
+
+                <div class="modal-buttons">
+                    <button type="submit">Save</button>
+
+                    <button type="button" onclick="closeRenameModal()">
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+
+            <h2>Delete account</h2>
+
+            <p id="deleteAccountMessage"></p>
+
+            <form action="{{ url_for('delete_account_route') }}" method="POST">
+
+                <input
+                    type="hidden"
+                    name="account_id"
+                    id="deleteAccountId"
+                >
+
+                <label for="deletePassword">Confirm your password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    id="deletePassword"
+                    required
+                >
+
+                <div class="modal-buttons">
+                    <button type="submit">Delete account</button>
+
+                    <button type="button" onclick="closeDeleteModal()">
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
 
 </div>
+
+<script>
+    const renameButtons = document.querySelectorAll(".rename-button");
+
+    const renameModal = document.getElementById("renameModal");
+    const renameAccountId = document.getElementById("renameAccountId");
+    const newAccountName = document.getElementById("newAccountName");
+
+    const deleteButtons = document.querySelectorAll(".delete-button");
+
+    const deleteModal = document.getElementById("deleteModal");
+    const deleteAccountId = document.getElementById("deleteAccountId");
+    const deletePassword = document.getElementById("deletePassword");
+    const deleteAccountMessage = document.getElementById("deleteAccountMessage");
+
+    renameButtons.forEach(button => {
+        button.addEventListener("click", function() {
+
+            const accountId = this.dataset.accountId;
+            const accountName = this.dataset.accountName;
+
+            renameAccountId.value = accountId;
+            newAccountName.value = accountName;
+
+            renameModal.style.display = "flex";
+            newAccountName.focus();
+
+        });
+    });
+
+
+    function closeRenameModal() {
+        renameModal.style.display = "none";
+    }
+
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", function() {
+
+            const accountId = this.dataset.accountId;
+            const accountName = this.dataset.accountName;
+
+            deleteAccountId.value = accountId;
+            deleteAccountMessage.textContent =
+                `Are you sure you want to delete "${accountName}"?`;
+
+            deletePassword.value = "";
+
+            deleteModal.style.display = "flex";
+            deletePassword.focus();
+
+        });
+    });
+
+    function closeDeleteModal() {
+        deleteModal.style.display = "none";
+    }
+    
+</script>
+
 {% endblock %}

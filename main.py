@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, flash, url_for
 from sqlalchemy import create_engine
 
-from user import Base, User, create_new_user, login_as_user, delete_user, create_jwt_token, get_user_by_token
-from account import Account, get_user_accounts, get_user_account
+from user import Base, User, create_new_user, login_as_user, delete_user, create_jwt_token, get_user_by_token, verify_password
+from account import Account, get_user_accounts, get_user_account, rename_account, delete_account
 
 flask = Flask(__name__)
 engine = create_engine("sqlite:///users.db")
@@ -141,6 +141,45 @@ def delete_user():
     else:
         flash("Invalid password", "error")
         return redirect(url_for("user"))
+
+@flask.route("/rename_account_route", methods=["POST"])
+def rename_account_route():
+    account_id = request.form.get("account_id", type=int)
+    new_name = request.form.get("new_name")
+    user = get_current_user()
+
+    if not user:
+        flash("Please log in first.", "error")
+        return redirect(url_for("login"))
+
+    if rename_account(engine, user, account_id, new_name):
+        flash("Account renamed", "success")
+    else:
+        flash("Invalid name", "error")
+    
+    return redirect(url_for("index"))
+
+@flask.route("/delete_account_route", methods=["POST"])
+def delete_account_route():
+    user = get_current_user()
+
+    if not user:
+        flash("Please log in first.", "error")
+        return redirect(url_for("login"))
+
+    account_id = request.form.get("account_id", type=int)
+    password = request.form.get("password", "")
+
+    if account_id is None or not password:
+        flash("Invalid request.", "error")
+
+    if not verify_password(user.password_hash, password):
+        flash("Incorrect password.", "error")
+
+    if delete_account(engine, user, account_id):
+        flash("Account deleted", "success")
+    
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     flask.run(host="127.0.0.1", port=5000, debug=True)
