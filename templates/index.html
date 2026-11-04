@@ -2,325 +2,616 @@
 
 {% block style %}
 <style>
-    .home-wrap {
-        width: min(1080px, 100%);
-        min-height: min(690px, calc(100vh - 120px));
-        margin: 0 auto;
+    .dashboard {
         display: grid;
-        place-items: center;
-        position: relative;
-        isolation: isolate;
+        grid-template-columns: 310px minmax(0, 1fr);
+        gap: 22px;
+        min-height: 590px;
+        margin: 32px 0;
     }
-    .home-wrap::before, .home-wrap::after {
-        content: '';
-        position: absolute;
-        z-index: -1;
-        border-radius: 50%;
-        filter: blur(1px);
+
+    /* Left account sidebar */
+    .sidebar, .main-panel {
+        min-width: 0;
+        border: 1px solid rgba(255,255,255,.9);
+        border-radius: 22px;
+        background: rgba(255,255,255,.84);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
     }
-    .home-wrap::before {
-        width: 300px; height: 300px; top: 13%; left: 9%;
-        border: 1px solid rgba(8, 127, 112, .13);
-        box-shadow: 0 0 0 28px rgba(8, 127, 112, .025), 0 0 0 58px rgba(8, 127, 112, .02);
+
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        padding: 22px 16px;
+        min-height: 590px;
     }
-    .home-wrap::after {
-        width: 170px; height: 170px; right: 12%; bottom: 13%;
-        background: linear-gradient(145deg, rgba(203, 232, 217, .6), rgba(203, 232, 217, 0));
-    }
-    .home-panel {
-        width: min(760px, 100%);
-        min-height: 350px;
-        padding: 76px 35px;
+
+    .sidebar-heading {
         display: flex;
         align-items: center;
-        justify-content: center;
-        border: 1px solid rgba(255,255,255,.9);
-        border-radius: 28px;
-        background: rgba(255,255,255,.76);
-        box-shadow: var(--shadow);
-        backdrop-filter: blur(16px);
-        position: relative;
-        overflow: hidden;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 5px 18px;
+        border-bottom: 1px solid var(--line);
     }
-    .home-panel::before {
-        content: '';
-        position: absolute;
-        width: 5px;
-        height: 70px;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        border-radius: 0 5px 5px 0;
-        background: var(--brand);
-    }
-    .home-panel h1 {
+
+    .sidebar-heading h2 {
         margin: 0;
+        font-size: 18px;
+    }
+
+    .account-count {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .create-form {
+        margin: 17px 0;
+    }
+
+    .create-form button {
+        width: 100%;
+    }
+
+    .account-list {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        flex: 1;
+        min-height: 0;
+        max-height: 440px;
+        overflow-y: auto;
+        padding: 2px 5px 8px 2px;
+        scrollbar-width: thin;
+        scrollbar-color: #b9d5ca transparent;
+    }
+
+    .account-list::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    .account-list::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: #b9d5ca;
+    }
+
+    .account-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background: #f5f8f6;
+        transition: background .2s, border-color .2s;
+    }
+
+    .account-item.active {
+        border-color: #b9ded0;
+        background: var(--mint);
+    }
+
+    .account-button {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 8px;
+        overflow: hidden;
         color: var(--ink);
-        font-size: clamp(38px, 7vw, 68px);
+        text-decoration: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .account-action {
+        width: 33px;
+        height: 33px;
+        flex-shrink: 0;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        cursor: pointer;
+        transition: background .2s;
+    }
+
+    .account-action:hover {
+        background: #e2eae5;
+    }
+
+    .empty-accounts {
+        padding: 25px 10px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    /* Main account area */
+    .main-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: clamp(25px, 5vw, 65px);
+        min-height: 590px;
+    }
+
+    .welcome-label {
+        margin: 0 0 9px;
+        color: var(--brand);
+        font-size: 12px;
         font-weight: 800;
-        letter-spacing: -.055em;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+    }
+
+    .main-panel h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 42px);
+        letter-spacing: -.045em;
+    }
+
+    .balance-card {
+        width: min(570px, 100%);
+        margin: 35px auto;
+        padding: 34px;
+        border: 1px solid #e0eee7;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #f3faf6, #e8f5ee);
         text-align: center;
     }
-    .account-button {
+
+    .balance-label {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .balance-value {
+        margin: 0;
+        color: var(--ink);
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(36px, 6vw, 58px);
+        font-weight: 800;
+        letter-spacing: -.055em;
+        overflow-wrap: anywhere;
+    }
+
+    .currency {
+        color: var(--brand);
+        font-size: .55em;
+        letter-spacing: 0;
+    }
+
+    .transaction-area {
+        width: min(570px, 100%);
+        margin: 0 auto;
+    }
+
+    .transaction-area label {
         display: block;
-        padding: 10px 15px;
-        background-color: #333;
-        color: white;
-        text-decoration: none;
-        border-radius: 6px;
-        margin-bottom: 8px;
+        margin-bottom: 9px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
     }
 
-    .account-button:hover {
-        background-color: #555;
-    }
-    @media (max-width: 600px) {
-        .home-wrap {
-            min-height: 70vh;
-        }
-
-        .home-panel {
-            min-height: 260px;
-            padding: 45px 20px;
-            border-radius: 22px;
-        }
+    .amount-input {
+        width: 100%;
+        height: 52px;
+        padding: 0 15px;
+        border: 1px solid #dce7e1;
+        border-radius: 11px;
+        color: var(--ink);
+        background: #fbfdfc;
+        font-size: 16px;
     }
 
+    .transaction-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 13px;
+    }
+
+    .transaction-buttons button {
+        min-height: 49px;
+    }
+
+    .withdraw-button {
+        color: var(--brand-dark);
+        background: #e4f2eb;
+    }
+
+    .withdraw-button:hover {
+        background: #d5eade;
+    }
+
+    .transaction-note {
+        margin: 13px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .guest-panel {
+        text-align: center;
+        align-items: center;
+    }
+
+    .guest-panel p {
+        max-width: 430px;
+        margin: 15px 0 25px;
+        color: var(--muted);
+        line-height: 1.7;
+    }
+
+    .guest-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    /* Modals */
     .modal {
         display: none;
         position: fixed;
         z-index: 1000;
         inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(15,35,31,.52);
+        backdrop-filter: blur(5px);
     }
 
     .modal-content {
+        width: min(420px, 100%);
+        padding: 28px;
+        border: 1px solid white;
+        border-radius: 19px;
         background: white;
-        color: #222;
-        padding: 25px;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 400px;
+        box-shadow: 0 25px 70px rgba(0,0,0,.18);
+    }
+
+    .modal-content h2 {
+        margin: 0 0 9px;
+        font-size: 22px;
+    }
+
+    .modal-content p {
+        color: var(--muted);
+        line-height: 1.5;
+    }
+
+    .modal-content label {
+        display: block;
+        margin: 17px 0 7px;
+        font-size: 13px;
+        font-weight: 700;
     }
 
     .modal-content input {
-        display: block;
         width: 100%;
-        box-sizing: border-box;
-        padding: 10px;
-        margin: 10px 0 20px;
+        height: 47px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
     }
 
     .modal-buttons {
         display: flex;
         justify-content: flex-end;
-        gap: 10px;
+        gap: 9px;
+        margin-top: 20px;
+    }
+
+    @media (max-width: 800px) {
+        .dashboard {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+            min-height: 0;
+        }
+
+        .account-list {
+            max-height: 230px;
+        }
+
+        .main-panel {
+            min-height: 480px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard {
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        .sidebar {
+            padding: 17px 12px;
+        }
+
+        .main-panel {
+            padding: 28px 18px;
+        }
+
+        .balance-card {
+            padding: 25px 15px;
+            margin: 25px auto;
+        }
+
+        .transaction-buttons {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}
 
+
 {% block body %}
-<div class="home-wrap">
-    <section class="home-panel">
-        <h1>HOME</h1>
-    </section>
+{% if user %}
+<div class="dashboard">
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <div class="flash {{ category }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endwith %}
-
-    <form action="{{ url_for('create_account_route') }}" method="POST">
-        <button type="submit">
-            + Create new account
-        </button>
-    </form>
-
-    {% for account in accounts %}
-        <div class="account-item">
-
-            {% if open_account and open_account.id == account.id %}
-                <a
-                    href="{{ url_for('index') }}"
-                    class="account-button"
-                >
-                    {{ account.name }} (Close)
-                </a>
-            {% else %}
-                <a
-                    href="{{ url_for('index', account_id=account.id) }}"
-                    class="account-button"
-                >
-                    {{ account.name }}
-                </a>
-            {% endif %}
-
-            <button
-                type="button"
-                class="rename-button"
-                data-account-id="{{ account.id }}"
-                data-account-name="{{ account.name }}"
-                title="Rename account"
-            >
-                ✏️
-            </button>
-
-            <button
-                type="button"
-                class="delete-button"
-                data-account-id="{{ account.id }}"
-                data-account-name="{{ account.name }}"
-                title="Delete account"
-            >
-                🗑️
-            </button>
-
+    <aside class="sidebar">
+        <div class="sidebar-heading">
+            <h2>Your accounts</h2>
+            <span class="account-count">{{ accounts|length }} total</span>
         </div>
-    {% endfor %}
+
+        <form class="create-form"
+              action="{{ url_for('create_account_route') }}"
+              method="POST">
+            <button class="primary-button" type="submit">
+                + Create account
+            </button>
+        </form>
+
+        <div class="account-list">
+            {% for account in accounts %}
+                <div class="account-item {% if open_account and open_account.id == account.id %}active{% endif %}">
+                    <a class="account-button"
+                       href="{{ url_for('index', account_id=account.id) }}">
+                        {{ account.name }}
+                    </a>
+
+                    <button type="button"
+                            class="account-action rename-button"
+                            data-account-id="{{ account.id }}"
+                            data-account-name="{{ account.name }}"
+                            title="Rename account"
+                            aria-label="Rename {{ account.name }}">
+                        ✏️
+                    </button>
+
+                    <button type="button"
+                            class="account-action delete-button"
+                            data-account-id="{{ account.id }}"
+                            data-account-name="{{ account.name }}"
+                            title="Delete account"
+                            aria-label="Delete {{ account.name }}">
+                        🗑️
+                    </button>
+                </div>
+            {% else %}
+                <div class="empty-accounts">
+                    You don't have any accounts yet.<br>
+                    Create one to get started.
+                </div>
+            {% endfor %}
+        </div>
+    </aside>
+
 
     {% if open_account %}
-        <h2>{{open_account.name}}</h2>
-        <p>{{ "%.2f"|format(open_account.balance) }}</p>
+    <section class="main-panel">
+        <p class="welcome-label">Account overview</p>
+        <h1>{{ open_account.name }}</h1>
 
-    {% elif user %}
-        <h1>Total: {{ "%.2f"|format(total) }}</h1>
+        <div class="balance-card">
+            <p class="balance-label">Available balance</p>
+            <p class="balance-value">
+                {{ "%.2f"|format(open_account.balance) }}
+                <span class="currency">$</span>
+            </p>
+        </div>
 
+        <div class="transaction-area">
+            <form action="{{ url_for('deposit_route') }}" method="POST">
+                <input type="hidden"
+                       name="account_id"
+                       value="{{ open_account.id }}">
+
+                <label for="transactionAmount">Amount</label>
+                <input class="amount-input"
+                       type="number"
+                       id="transactionAmount"
+                       name="amount"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="Enter an amount"
+                       required>
+
+                <div class="transaction-buttons">
+                    <button class="primary-button"
+                            type="submit"
+                            name="direction"
+                            value="insert">
+                        + Insert
+                    </button>
+
+                    <button class="primary-button withdraw-button"
+                            type="submit"
+                            name="direction"
+                            value="withdraw">
+                        − Withdraw
+                    </button>
+                </div>
+            </form>
+
+            <p class="transaction-note">
+                Choose Insert to add money or Withdraw to remove money.
+            </p>
+        </div>
+    </section>
+
+    {% else %}
+    <section class="main-panel">
+        <p class="welcome-label">Welcome back</p>
+        <h1>Your money, at a glance.</h1>
+
+        <div class="balance-card">
+            <p class="balance-label">Total across all accounts</p>
+            <p class="balance-value">
+                {{ "%.2f"|format(total) }}
+                <span class="currency">$</span>
+            </p>
+        </div>
+
+        <p style="color:var(--muted); text-align:center;">
+            Select an account from the left to view its balance and manage it.
+        </p>
+    </section>
     {% endif %}
-    
-    <div id="renameModal" class="modal">
-        <div class="modal-content">
-
-            <h2>Rename account</h2>
-
-            <form action="{{ url_for('rename_account_route') }}" method="POST">
-
-                <input
-                    type="hidden"
-                    name="account_id"
-                    id="renameAccountId"
-                >
-
-                <label for="newAccountName">New account name</label>
-
-                <input
-                    type="text"
-                    name="new_name"
-                    id="newAccountName"
-                    maxlength="255"
-                    required
-                >
-
-                <div class="modal-buttons">
-                    <button type="submit">Save</button>
-
-                    <button type="button" onclick="closeRenameModal()">
-                        Cancel
-                    </button>
-                </div>
-
-            </form>
-        </div>
-    </div>
-
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-
-            <h2>Delete account</h2>
-
-            <p id="deleteAccountMessage"></p>
-
-            <form action="{{ url_for('delete_account_route') }}" method="POST">
-
-                <input
-                    type="hidden"
-                    name="account_id"
-                    id="deleteAccountId"
-                >
-
-                <label for="deletePassword">Confirm your password</label>
-
-                <input
-                    type="password"
-                    name="password"
-                    id="deletePassword"
-                    required
-                >
-
-                <div class="modal-buttons">
-                    <button type="submit">Delete account</button>
-
-                    <button type="button" onclick="closeDeleteModal()">
-                        Cancel
-                    </button>
-                </div>
-
-            </form>
-        </div>
-    </div>
 
 </div>
 
+{% else %}
+<section class="main-panel guest-panel" style="margin-top:35px;">
+    <p class="welcome-label">Simple personal finance</p>
+    <h1>A clearer view of your money.</h1>
+    <p>
+        Create accounts, keep track of balances, and manage your money
+        from one simple dashboard.
+    </p>
+    <div class="guest-actions">
+        <a class="primary-button"
+           style="display:inline-flex;align-items:center;text-decoration:none;"
+           href="{{ url_for('sign_in') }}">Create an account</a>
+
+        <a class="secondary-button"
+           style="display:inline-flex;align-items:center;text-decoration:none;"
+           href="{{ url_for('log_in') }}">Log in</a>
+    </div>
+</section>
+{% endif %}
+
+
+<!-- Rename modal -->
+<div id="renameModal" class="modal">
+    <div class="modal-content">
+        <h2>Rename account</h2>
+        <p>Choose a new name for this account.</p>
+
+        <form action="{{ url_for('rename_account_route') }}" method="POST">
+            <input type="hidden" name="account_id" id="renameAccountId">
+
+            <label for="newAccountName">Account name</label>
+            <input type="text"
+                   name="new_name"
+                   id="newAccountName"
+                   maxlength="255"
+                   required>
+
+            <div class="modal-buttons">
+                <button class="secondary-button"
+                        type="button"
+                        onclick="closeRenameModal()">Cancel</button>
+                <button class="primary-button" type="submit">Save name</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Delete modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h2>Delete account</h2>
+        <p id="deleteAccountMessage"></p>
+
+        <form action="{{ url_for('delete_account_route') }}" method="POST">
+            <input type="hidden" name="account_id" id="deleteAccountId">
+
+            <label for="deletePassword">Confirm your password</label>
+            <input type="password"
+                   name="password"
+                   id="deletePassword"
+                   autocomplete="current-password"
+                   required>
+
+            <div class="modal-buttons">
+                <button class="secondary-button"
+                        type="button"
+                        onclick="closeDeleteModal()">Cancel</button>
+                <button class="danger-button" type="submit">Delete account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <script>
-    const renameButtons = document.querySelectorAll(".rename-button");
-
     const renameModal = document.getElementById("renameModal");
-    const renameAccountId = document.getElementById("renameAccountId");
-    const newAccountName = document.getElementById("newAccountName");
-
-    const deleteButtons = document.querySelectorAll(".delete-button");
-
     const deleteModal = document.getElementById("deleteModal");
-    const deleteAccountId = document.getElementById("deleteAccountId");
-    const deletePassword = document.getElementById("deletePassword");
-    const deleteAccountMessage = document.getElementById("deleteAccountMessage");
 
-    renameButtons.forEach(button => {
-        button.addEventListener("click", function() {
+    document.querySelectorAll(".rename-button").forEach(button => {
+        button.addEventListener("click", function () {
+            document.getElementById("renameAccountId").value =
+                this.dataset.accountId;
 
-            const accountId = this.dataset.accountId;
-            const accountName = this.dataset.accountName;
-
-            renameAccountId.value = accountId;
-            newAccountName.value = accountName;
+            document.getElementById("newAccountName").value =
+                this.dataset.accountName;
 
             renameModal.style.display = "flex";
-            newAccountName.focus();
-
+            document.getElementById("newAccountName").focus();
         });
     });
 
+    document.querySelectorAll(".delete-button").forEach(button => {
+        button.addEventListener("click", function () {
+            document.getElementById("deleteAccountId").value =
+                this.dataset.accountId;
+
+            document.getElementById("deleteAccountMessage").textContent =
+                `Are you sure you want to delete "${this.dataset.accountName}"?`;
+
+            document.getElementById("deletePassword").value = "";
+
+            deleteModal.style.display = "flex";
+            document.getElementById("deletePassword").focus();
+        });
+    });
 
     function closeRenameModal() {
         renameModal.style.display = "none";
     }
 
-    deleteButtons.forEach(button => {
-        button.addEventListener("click", function() {
-
-            const accountId = this.dataset.accountId;
-            const accountName = this.dataset.accountName;
-
-            deleteAccountId.value = accountId;
-            deleteAccountMessage.textContent =
-                `Are you sure you want to delete "${accountName}"?`;
-
-            deletePassword.value = "";
-
-            deleteModal.style.display = "flex";
-            deletePassword.focus();
-
-        });
-    });
-
     function closeDeleteModal() {
         deleteModal.style.display = "none";
     }
 
-</script>
+    // Clicking the dark background closes the modal.
+    [renameModal, deleteModal].forEach(modal => {
+        modal.addEventListener("click", event => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    });
 
+    // Escape closes whichever modal is open.
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            closeRenameModal();
+            closeDeleteModal();
+        }
+    });
+</script>
 {% endblock %}

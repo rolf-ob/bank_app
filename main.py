@@ -1,12 +1,12 @@
 import os
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, flash, url_for
 from sqlalchemy import create_engine
 
 from user import Base, User, create_new_user, login_as_user, delete_user, create_jwt_token, get_user_by_token, verify_password
-from account import Account, get_user_accounts, get_user_account, rename_account, delete_account, create_account
+from account import Account, get_user_accounts, get_user_account, rename_account, delete_account, create_account, deposit_money
 
 flask = Flask(__name__)
 engine = create_engine("sqlite:///users.db")
@@ -128,8 +128,8 @@ def log_out():
     resp.delete_cookie("token")
     return resp
 
-@flask.route("/delete_user", methods=["POST"])
-def delete_user():
+@flask.route("/delete_user_route", methods=["POST"])
+def delete_user_route():
     password = request.form.get("password")
 
     resp = redirect(url_for("index"))
@@ -148,7 +148,7 @@ def create_account_route():
 
     if not user:
         flash("Please log in first.", "error")
-        return redirect(url_for("login"))
+        return redirect(url_for("log_in"))
 
     create_account(engine, user)
 
@@ -164,7 +164,7 @@ def rename_account_route():
 
     if not user:
         flash("Please log in first.", "error")
-        return redirect(url_for("login"))
+        return redirect(url_for("log_in"))
 
     if rename_account(engine, user, account_id, new_name):
         flash("Account renamed", "success")
@@ -179,7 +179,7 @@ def delete_account_route():
 
     if not user:
         flash("Please log in first.", "error")
-        return redirect(url_for("login"))
+        return redirect(url_for("log_in"))
 
     account_id = request.form.get("account_id", type=int)
     password = request.form.get("password", "")
@@ -189,11 +189,50 @@ def delete_account_route():
 
     if not verify_password(user.password_hash, password):
         flash("Incorrect password.", "error")
-
-    if delete_account(engine, user, account_id):
-        flash("Account deleted", "success")
+    elif delete_account(engine, user, account_id):
+            flash("Account deleted", "success")
     
     return redirect(url_for("index"))
+
+@flask.route("/deposit_route", methods=["POST"])
+def deposit_route():
+    user = get_current_user()
+
+    if not user:
+        flash("Please log in first.", "error")
+        return redirect(url_for("log_in"))
+
+    account_id = request.form.get("account_id", type=int)
+    amount_input = request.form.get("amount", "").strip()
+    direction = request.form.get("direction")
+
+    if account_id is None or not amount_input:
+        flash("Please enter a valid amount.", "error")
+        return redirect(url_for("index"))
+
+    try:
+        amount = Decimal(amount_input)
+    except InvalidOperation:
+        flash("Please enter a valid number.", "error")
+        return redirect(url_for("index", account_id=account_id))
+
+    if direction == "insert":
+        amount = abs(amount)
+    elif direction == "withdraw":
+        amount = -abs(amount)
+    else:
+        flash("Invalid transaction type.", "error")
+        return redirect(url_for("index", account_id=account_id))
+
+    if deposit_money(engine, user, account_id, amount):
+        if amount > 0:
+            flash(f"Successfully inserted {amount:.2f}!", "success")
+        else:
+            flash(f"Successfully withdrew {abs(amount):.2f}!", "success")
+    else:
+        flash("Transaction failed. Check the amount and available balance.", "error")
+
+    return redirect(url_for("index", account_id=account_id))
 
 if __name__ == "__main__":
     flask.run(host="127.0.0.1", port=5000, debug=True)

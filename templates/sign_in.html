@@ -2,83 +2,109 @@
 
 {% block style %}
 <style>
-    #login {
-        width: min(510px, 100%);
-        min-height: 440px;
-        margin: 70px auto 0;
-        padding: 48px 52px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: stretch;
-        border: 1px solid rgba(255,255,255,.95);
-        border-radius: 24px;
-        background: rgba(255,255,255,.86);
+    .auth-card {
+        width: min(480px, 100%);
+        margin: 65px auto;
+        padding: 42px;
+        border: 1px solid rgba(255,255,255,.9);
+        border-radius: 22px;
+        background: rgba(255,255,255,.88);
         box-shadow: var(--shadow);
-        backdrop-filter: blur(14px);
     }
-    #title {
-        margin: 0 0 30px;
-        color: var(--ink);
-        font-size: clamp(25px, 4vw, 32px);
-        line-height: 1.2;
-        letter-spacing: -.045em;
+
+    .auth-card h1 {
+        margin: 0 0 10px;
         text-align: center;
+        font-size: 30px;
+        letter-spacing: -.04em;
     }
-    #login_textboxes { display: flex; flex-direction: column; gap: 13px; }
-    .textbox {
-        width: 100%;
-        height: 54px;
-        margin: 0;
-        padding: 0 17px;
-        border: 1px solid #dce7e1;
-        border-radius: 11px;
-        color: var(--ink);
-        background: #f9fbfa;
-        font-size: 15px;
-        transition: border-color .2s, box-shadow .2s, background .2s;
+
+    .auth-description {
+        margin: 0 0 30px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.6;
     }
-    .textbox::placeholder { color: #9aa9a3; }
-    .textbox:focus { border-color: var(--brand); background: #fff; box-shadow: 0 0 0 4px rgba(8,127,112,.09); outline: none; }
-    #login_buttons { display: flex; justify-content: center; margin-top: 23px; }
-    .button {
-        width: 100%;
-        min-height: 52px;
-        margin: 0;
-        padding: 0 20px;
-        border: 0;
-        border-radius: 11px;
-        font-size: 15px;
+
+    .auth-card label {
+        display: block;
+        margin: 17px 0 7px;
+        font-size: 13px;
         font-weight: 700;
-        cursor: pointer;
-        transition: background .2s, transform .2s, box-shadow .2s;
     }
-    #create_user_button {
-        color: #fff;
-        background: var(--brand);
-        box-shadow: 0 8px 18px rgba(8,127,112,.2);
+
+    .auth-input {
+        width: 100%;
+        height: 51px;
+        padding: 0 14px;
+        border: 1px solid #dce7e1;
+        border-radius: 10px;
+        background: #f9fbfa;
+        color: var(--ink);
     }
-    #create_user_button:hover { background: var(--brand-dark); transform: translateY(-2px); box-shadow: 0 11px 22px rgba(8,127,112,.25); }
-    @media (max-width: 560px) { #login { margin-top: 38px; padding: 38px 25px; min-height: 400px; } }
+
+    .auth-submit {
+        width: 100%;
+        margin-top: 25px;
+    }
+
+    .auth-footer {
+        margin: 22px 0 0;
+        color: var(--muted);
+        text-align: center;
+        font-size: 13px;
+    }
+
+    .auth-footer a {
+        color: var(--brand);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    @media (max-width: 550px) {
+        .auth-card {
+            margin: 35px auto;
+            padding: 30px 22px;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<div id="login">
-    <h1 id="title">CREATE USER</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <div class="flash {{ category }}">{{ message }}</div>
-        {% endfor %}
-    {% endwith %}
-    <form action="/create_user" method="POST">
-        <div id="login_textboxes">
-            <input type="email" name="email" class="textbox" placeholder="Email address">
-            <input type="password" name="password" class="textbox" placeholder="Password">
-        </div>
-        <div id="login_buttons">
-            <button class="button" id="create_user_button" name="action">Create User</button>
-        </div>
+<section class="auth-card">
+    <h1>Create your account</h1>
+    <p class="auth-description">
+        Get started by creating your personal account.
+    </p>
+
+    <form action="{{ url_for('create_user') }}" method="POST">
+        <label for="email">Email address</label>
+        <input class="auth-input"
+               type="email"
+               id="email"
+               name="email"
+               autocomplete="email"
+               placeholder="you@example.com"
+               required>
+
+        <label for="password">Password</label>
+        <input class="auth-input"
+               type="password"
+               id="password"
+               name="password"
+               autocomplete="new-password"
+               placeholder="Choose a password"
+               required>
+
+        <button class="primary-button auth-submit" type="submit">
+            Create account
+        </button>
     </form>
-</div>
+
+    <p class="auth-footer">
+        Already have an account?
+        <a href="{{ url_for('log_in') }}">Log in</a>
+    </p>
+</section>
 {% endblock %}

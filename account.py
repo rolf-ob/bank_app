@@ -11,6 +11,7 @@ class Account(Base):
 
     __table_args__ = (
         UniqueConstraint("user_id", "name"),
+        {"sqlite_autoincrement": True}
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -19,7 +20,10 @@ class Account(Base):
     user: Mapped["User"] = relationship(back_populates="accounts")
 
     name: Mapped[str] = mapped_column(String(255))
-    balance: Mapped[int] = mapped_column(Numeric(precision=12, scale=12))
+    balance: Mapped[Decimal] = mapped_column(
+        Numeric(precision=12, scale=2),
+        default=Decimal("0.00")
+    )
 
 def create_account(engine, user):
     with Session(engine) as session:
@@ -91,11 +95,41 @@ def delete_account(engine, user, account_id):
             Account.user_id == user.id,
             Account.id == account_id
         )
+
+        account = session.scalar(statement)
+
+        if not account:
+            return False
+
+        if account.balance != Decimal("0.00"):
+            return False
+
+        session.delete(account)
+        session.commit()
+        return True
+
+def deposit_money(engine, user, account_id, amount):
+    if not amount.is_finite() or amount == Decimal("0.00"):
+        return False
+
+    if amount != amount.quantize(Decimal("0.01")):
+        return False
+
+    with Session(engine) as session:
+        statement = select(Account).where(
+            Account.id == account_id,
+            Account.user_id == user.id
+        )
         account = session.scalar(statement)
 
         if account:
-            session.delete(account)
-            session.commit()
+            new_balance = account.balance + amount
 
+            if new_balance < Decimal("0.00"):
+                return False
+
+            account.balance = new_balance
+            session.commit()
             return True
+        
         return False

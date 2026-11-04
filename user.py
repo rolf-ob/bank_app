@@ -48,12 +48,21 @@ def login_as_user(engine, email, password):
     return None
 
 def delete_user(engine, user, password):
-    with Session(engine) as session:
-        if verify_password(user.password_hash, password):
-            session.delete(user)
-            session.commit()
-            return True
+    if not user:
         return False
+
+    with Session(engine) as session:
+        database_user = session.get(User, user.id)
+
+        if not database_user:
+            return False
+
+        if not verify_password(database_user.password_hash, password):
+            return False
+
+        session.delete(database_user)
+        session.commit()
+        return True
 
 def get_user_by_email(engine, email):
     with Session(engine) as session:
