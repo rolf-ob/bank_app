@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, flash, url_for
 from sqlalchemy import create_engine
 
 from user import Base, User, create_new_user, login_as_user, delete_user, create_jwt_token, get_user_by_token, verify_password
-from account import Account, get_user_accounts, get_user_account, rename_account, delete_account
+from account import Account, get_user_accounts, get_user_account, rename_account, delete_account, create_account
 
 flask = Flask(__name__)
 engine = create_engine("sqlite:///users.db")
@@ -141,6 +141,20 @@ def delete_user():
     else:
         flash("Invalid password", "error")
         return redirect(url_for("user"))
+
+@flask.route("/create_account_route", methods=["POST"])
+def create_account_route():
+    user = get_current_user()
+
+    if not user:
+        flash("Please log in first.", "error")
+        return redirect(url_for("login"))
+
+    create_account(engine, user)
+
+    flash("Account created", "success")
+
+    return redirect(url_for("index"))
 
 @flask.route("/rename_account_route", methods=["POST"])
 def rename_account_route():

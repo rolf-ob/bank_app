@@ -21,16 +21,20 @@ class Account(Base):
     name: Mapped[str] = mapped_column(String(255))
     balance: Mapped[int] = mapped_column(Numeric(precision=12, scale=12))
 
-def create_account(engine, user, name):
+def create_account(engine, user):
     with Session(engine) as session:
         try:
             account = Account(
-                user=user,
-                name=name,
+                user_id=user.id,
+                name="TEMP",
                 balance=Decimal("0.00")
             )
 
             session.add(account)
+            session.flush()
+
+            account.name = f"Account #{account.id}"
+
             session.commit()
             return account
         
